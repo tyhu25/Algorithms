@@ -12,7 +12,7 @@ printf("Error: "); printf(a); \
 printf("Exiting from line %i in file %s\n",__LINE__,__FILE__); \
 printf("\nCausing Segmentation Fault to exit ungracefully\n"); \
        int * junk = NULL; (*junk)++;\
-       printf("%i\n",(int)junk);}
+       printf("%i\n",*(int *)junk);}
 	   
 #define VERIFY(condition) \
 if (!(condition)) { \
