@@ -41,7 +41,13 @@ public:
 	~RedBlackTree();
 	void checkAssumptions() const;
 	void print() const;
+	RedBlackTreeNode * getPredecessor(RedBlackTreeNode * curr) const;
+	RedBlackTreeNode * getSuccessor(RedBlackTreeNode * curr) const;
+	
+	//TODO: Private method
 	void printHelper(RedBlackTreeNode *root) const;
+	void leftRotate(RedBlackTreeNode *x);
+	void rightRotate(RedBlackTreeNode *x);
 
 private:
 	RedBlackTreeNode *root;
