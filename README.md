@@ -1,7 +1,7 @@
 # Algorithms
-HOW TO BUILD:
-cd directory
-make
+## HOW TO BUILD:
+-cd directory
+-make
 
-Implementations:
+## Implementations:
 -Redblack Tree
