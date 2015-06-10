@@ -43,6 +43,8 @@ public:
 	void print() const;
 	RedBlackTreeNode * getPredecessor(RedBlackTreeNode * curr) const;
 	RedBlackTreeNode * getSuccessor(RedBlackTreeNode * curr) const;
+	void insert(int v);
+	void insertFixUp(RedBlackTreeNode *x);
 	
 	//TODO: Private method
 	void printHelper(RedBlackTreeNode *root) const;

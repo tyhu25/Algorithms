@@ -4,16 +4,12 @@
 
 RedBlackTree::RedBlackTree()
 {
-	//both nil and root are sentinel
 	nil = new RedBlackTreeNode();
 	nil->val = INT_MIN;
 	nil->color = COLOR_BLACK;
 	nil->left = nil->right = nil->parent = nil;
-	
-	root = new RedBlackTreeNode();
-	root->val = INT_MAX;
-	root->color = COLOR_BLACK;
-	root->parent = root->left = root->right = nil;
+
+	root = 0;
 }
 
 RedBlackTree::~RedBlackTree()
@@ -21,23 +17,96 @@ RedBlackTree::~RedBlackTree()
 	//TODO: delete tree
 }
 
+void RedBlackTree::insert(int v)
+{
+	RedBlackTreeNode * x = new RedBlackTreeNode(v, COLOR_RED);
+	x->left = x->right = nil;
+	RedBlackTreeNode * y = 0;
+	RedBlackTreeNode * curr = root;
+	while(curr!=0 && curr!=nil)
+	{
+		y = curr;
+		if(x->val<curr->val) curr = curr->left;
+		else curr = curr->right;
+	}
+	
+	x->parent = y;
+	if(y==0) root = x;
+	else if(x->val<y->val) y->left = x;
+	else y->right = x;
+	
+	insertFixUp(x);
+}
+
+void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
+{
+	while(x->parent!=0 && x->parent->color==COLOR_RED)
+	{
+		RedBlackTreeNode *px = x->parent;
+		if(px == px->parent->left)
+		{
+			RedBlackTreeNode *y = px->parent->right;
+			if(y->color == COLOR_RED)
+			{
+				y->color = COLOR_BLACK;
+				px->color = COLOR_BLACK;
+				px->parent->color = COLOR_RED;
+				x = px->parent;
+			}
+			else 
+			{
+				if(x==px->right)
+				{
+					x = px;
+					leftRotate(x);
+				}
+				px->color = COLOR_BLACK;
+				px->parent->color = COLOR_RED;
+				rightRotate(px->parent);
+			}
+		}
+		else
+		{
+			RedBlackTreeNode *y = px->parent->left;
+			if(y->color==COLOR_RED)
+			{
+				y->color = COLOR_BLACK;
+				px->color = COLOR_BLACK;
+				px->parent->color = COLOR_RED;
+				x = px->parent;
+			}
+			else
+			{
+				if(x==px->left)
+				{
+					x = px;
+					rightRotate(x);
+				}
+				px->color = COLOR_BLACK;
+				px->parent->color = COLOR_RED;
+				leftRotate(px->parent);
+			}
+		} 
+	}
+	root->color = COLOR_BLACK;
+}
+
 void RedBlackTree::checkAssumptions() const 
 {
 	VERIFY(nil->val == INT_MIN);
-	VERIFY(root->val == INT_MAX);
 	VERIFY(nil->color == COLOR_BLACK);
-	VERIFY(root->color == COLOR_BLACK);
+	VERIFY(root==0 || root->color == COLOR_BLACK);
 }
 
 void RedBlackTree::print() const
 {
 	printHelper(root);
+	cout<<endl;
 }
 
 void RedBlackTree::printHelper(RedBlackTreeNode *root) const
 {
-	//TODO: Check equality with nil
-	if(root==0)
+	if(root==0 || root==nil)
 	{
 		cout<<"#(B)";
 		return;
@@ -51,11 +120,10 @@ void RedBlackTree::printHelper(RedBlackTreeNode *root) const
 
 RedBlackTreeNode * RedBlackTree::getPredecessor(RedBlackTreeNode * curr) const
 {
-	//TODO: Check equality with nil
-	if(curr->left!=0)
+	if(curr->left!=nil)
 	{
 		RedBlackTreeNode *res = curr->left;
-		while(res->right!=0) res = res->right;
+		while(res->right!=nil) res = res->right;
 		return res;
 	}
 	while(curr->parent!=0 && curr==curr->parent->left) curr = curr->parent;
@@ -65,10 +133,10 @@ RedBlackTreeNode * RedBlackTree::getPredecessor(RedBlackTreeNode * curr) const
 
 RedBlackTreeNode * RedBlackTree::getSuccessor(RedBlackTreeNode * curr) const
 {
-	if(curr->right!=0)
+	if(curr->right!=nil)
 	{
 		RedBlackTreeNode *res = curr->right;
-		while(res->left!=0) res = res->left;
+		while(res->left!=nil) res = res->left;
 		return res;
 	}
 	while(curr->parent!=0 && curr==curr->parent->right) curr = curr->parent;
@@ -79,12 +147,12 @@ void RedBlackTree::leftRotate(RedBlackTreeNode *x)
 {
 	RedBlackTreeNode *y = x->right;
 	x->right = y->left;
-	
-	//TODO: nil
+
 	if(y->left!=nil) y->left->parent = x;
 
 	y->parent = x->parent;
-	if(x==x->parent->left) x->parent->left = y;
+	if(x->parent==0) root = y;
+	else if(x==x->parent->left) x->parent->left = y;
 	else x->parent->right = y;
 	
 	x->parent = y;
@@ -103,11 +171,12 @@ void RedBlackTree::rightRotate(RedBlackTreeNode *x)
 {
 	RedBlackTreeNode *y = x->left;
 	x->left = y->right;
-	
-	//TODO:
+
 	if(y->right!=nil) y->right->parent = x;
 	y->parent = x->parent;
-	if(x==x->parent->left) x->parent->left = y;
+	
+	if(x->parent==0) root = y;
+	else if(x==x->parent->left) x->parent->left = y;
 	else x->parent->right = y;
 	x->parent = y;
 	y->right=x;
