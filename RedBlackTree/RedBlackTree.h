@@ -44,12 +44,13 @@ public:
 	RedBlackTreeNode * getPredecessor(RedBlackTreeNode * curr) const;
 	RedBlackTreeNode * getSuccessor(RedBlackTreeNode * curr) const;
 	void insert(int v);
-	void insertFixUp(RedBlackTreeNode *x);
+	RedBlackTreeNode * search(int key);
 	
 	//TODO: Private method
 	void printHelper(RedBlackTreeNode *root) const;
 	void leftRotate(RedBlackTreeNode *x);
 	void rightRotate(RedBlackTreeNode *x);
+	void insertFixUp(RedBlackTreeNode *x);
 
 private:
 	RedBlackTreeNode *root;

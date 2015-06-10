@@ -1,6 +1,6 @@
 #include "RedBlackTree.h"
 
-// #define CHECK_RB_TREE_ASSUMPTIONS 1
+#define CHECK_RB_TREE_ASSUMPTIONS 1
 
 RedBlackTree::RedBlackTree()
 {
@@ -36,6 +36,13 @@ void RedBlackTree::insert(int v)
 	else y->right = x;
 	
 	insertFixUp(x);
+	
+#ifdef CHECK_RB_TREE_ASSUMPTIONS
+	checkAssumptions();
+#elif defined(DEBUG_ASSERT)
+	Assert(nil->color==COLOR_BLACK,"nil not black in RedBlackTree::Insert");
+	Assert(root==0 || root->color==COLOR_BLACK,"root not red in RedBlackTree::Insert");
+#endif
 }
 
 void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
@@ -89,6 +96,13 @@ void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
 		} 
 	}
 	root->color = COLOR_BLACK;
+}
+
+RedBlackTreeNode * RedBlackTree::search(int key)
+{
+	RedBlackTreeNode * res;
+	
+	return res;
 }
 
 void RedBlackTree::checkAssumptions() const 
@@ -158,13 +172,11 @@ void RedBlackTree::leftRotate(RedBlackTreeNode *x)
 	x->parent = y;
 	y->left = x;
 	
-/*
 #ifdef CHECK_RB_TREE_ASSUMPTIONS
-  CheckAssumptions();
+	checkAssumptions();
 #elif defined(DEBUG_ASSERT)
-  Assert(!nil->red,"nil not black in RedBlackTree::LeftRotate");
+	Assert(nil->color==COLOR_BLACK,"nil not black in RedBlackTree::LeftRotate");
 #endif
-*/
 }
 	
 void RedBlackTree::rightRotate(RedBlackTreeNode *x)
@@ -181,11 +193,9 @@ void RedBlackTree::rightRotate(RedBlackTreeNode *x)
 	x->parent = y;
 	y->right=x;
 
-/*
 #ifdef CHECK_RB_TREE_ASSUMPTIONS
-	CheckAssumptions();
+	checkAssumptions();
 #elif defined(DEBUG_ASSERT)
-  Assert(!nil->red,"nil not black in RedBlackTree::Right");
+ 	Assert(nil->color==COLOR_BLACK,"nil not black in RedBlackTree::Right");
 #endif
-*/
 }
