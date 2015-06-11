@@ -55,6 +55,7 @@ void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
 			RedBlackTreeNode *y = px->parent->right;
 			if(y->color == COLOR_RED)
 			{
+				//case 1
 				y->color = COLOR_BLACK;
 				px->color = COLOR_BLACK;
 				px->parent->color = COLOR_RED;
@@ -64,9 +65,11 @@ void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
 			{
 				if(x==px->right)
 				{
+					//case 2
 					x = px;
 					leftRotate(x);
 				}
+				//case 3
 				px->color = COLOR_BLACK;
 				px->parent->color = COLOR_RED;
 				rightRotate(px->parent);
@@ -98,11 +101,119 @@ void RedBlackTree::insertFixUp(RedBlackTreeNode *x)
 	root->color = COLOR_BLACK;
 }
 
+int RedBlackTree::deleteNode(RedBlackTreeNode *z)
+{
+	RedBlackTreeNode *x;
+	RedBlackTreeNode *y;
+	int res = z->val;
+	if(z->left==nil||z->right==nil) y = z;
+	else y = getSuccessor(z);
+	x = ((y->left==nil)?(y->right):(y->left));
+	if(x!=nil) x->parent = y->parent;
+	if(y->parent==0) root = x;
+	else if(y==y->parent->left) y->parent->left = x;
+	else y->parent->right = x;
+	
+	if(y!=z)
+	{
+		z->val = y->val;
+		z->color = y->color;
+	}
+	
+	if(y->color==COLOR_BLACK) deleteFixUp(x);
+	
+#ifdef CHECK_RB_TREE_ASSUMPTIONS
+	checkAssumptions();
+#elif defined(DEBUG_ASSERT)
+	Assert(nil->color==COLOR_BLACK,"nil not black in RedBlackTree::Insert");
+	Assert(root==0 || root->color==COLOR_BLACK,"root not red in RedBlackTree::Insert");
+#endif
+	return res;
+}
+
+void RedBlackTree::deleteFixUp(RedBlackTreeNode *x)
+{
+	while(x->parent!=0 && x->color==COLOR_BLACK)
+	{
+		RedBlackTreeNode *w;
+		if(x==x->parent->left)
+		{
+			w = x->parent->right;
+			if(w->color==COLOR_RED)
+			{
+				x->parent->color = COLOR_RED;
+				w->color = COLOR_BLACK;
+				leftRotate(x->parent);
+				w=x->parent->right;
+			}
+			if(w->left->color==COLOR_BLACK && w->right->color==COLOR_BLACK)
+			{
+				w->color = COLOR_RED;
+				x=x->parent;
+			}
+			else
+			{
+				if(w->right->color==COLOR_BLACK)
+				{
+					w->left->color = COLOR_BLACK;
+					w->color = COLOR_RED;
+					rightRotate(w);
+					w = x->parent->right;
+				}
+				w->color = x->parent->color;
+				x->parent->color = COLOR_BLACK;
+				w->right->color = COLOR_BLACK;
+				leftRotate(x->parent);
+				x=root;
+			}
+		}
+		else
+		{
+			w = x->parent->left;
+			if(w->color == COLOR_RED)
+			{
+				x->parent->color = COLOR_RED;
+				w->color = COLOR_BLACK;
+				rightRotate(x->parent);
+				w = x->parent->left;
+			}
+			if(w->left->color == COLOR_BLACK && w->right->color == COLOR_BLACK)
+			{
+				w->color = COLOR_RED;
+				x=x->parent;
+			}
+			else
+			{
+				if(w->left->color == COLOR_BLACK)
+				{
+					w->right->color = COLOR_BLACK;
+					w->color = COLOR_RED;
+					leftRotate(w);
+					w = x->parent->left;
+				}
+				w->color = x->parent->color;
+				x->parent->color = COLOR_BLACK;
+				w->left->color = COLOR_BLACK;
+				rightRotate(x->parent);
+				x = root;
+			}
+			
+		}
+	}
+	x->color = COLOR_BLACK;
+}
+
 RedBlackTreeNode * RedBlackTree::search(int key)
 {
-	RedBlackTreeNode * res;
+	if(root==0) return 0;
+	RedBlackTreeNode *curr=root;
+	while(curr!=nil && key!=curr->val)
+	{
+		if(key<curr->val) curr = curr->left;
+		else curr = curr->right;
+	}
 	
-	return res;
+	return curr;
 }
 
 void RedBlackTree::checkAssumptions() const 

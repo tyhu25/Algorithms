@@ -45,6 +45,8 @@ public:
 	RedBlackTreeNode * getSuccessor(RedBlackTreeNode * curr) const;
 	void insert(int v);
 	RedBlackTreeNode * search(int key);
+	int deleteNode(RedBlackTreeNode *z);
+	void deleteFixUp(RedBlackTreeNode *x);
 	
 	//TODO: Private method
 	void printHelper(RedBlackTreeNode *root) const;

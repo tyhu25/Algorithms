@@ -22,5 +22,19 @@ int main()
 	rb.print();
 	rb.insert(8);
 	rb.print();
+	
+	RedBlackTreeNode * n;
+	n = rb.search(3);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
+	n= rb.search(6);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
+	n = rb.search(9);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
 	return 1;
 }
