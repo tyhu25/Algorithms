@@ -1,4 +1,4 @@
 all:
-	g++ -I ../Utils/ Main.cpp RedBlackTree.cpp -o Main
+	g++ -I ../Utils/ Main.cpp RedBlackTree.cpp -o Solution
 clean:
-	rm -f *o Main
+	rm -f *o Solution
