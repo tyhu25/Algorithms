@@ -2,7 +2,7 @@
 ## HOW TO BUILD:
 -cd directory  
 -make
--./Solution
+-./Solution  
 
 ## Implementations:
 -Redblack Tree
