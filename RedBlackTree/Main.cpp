@@ -1,64 +1,38 @@
 #include "RedBlackTree.h"
 
+void testRedBlackTree();
+
 int main()
 {
-	RedBlackTree rb;
-	rb.print();
-	rb.insert(5);
-	rb.print();
-	rb.insert(3);
-	rb.print();
-	rb.insert(7);
-	rb.print();
-	rb.insert(4);
-	rb.print();
-	rb.insert(6);
-	rb.print();
-	rb.insert(1);
-	rb.print();
-	rb.insert(9);
-	rb.print();
-	rb.insert(2);
-	rb.print();
-	rb.insert(8);
-	rb.print();
-	
-	RedBlackTreeNode * n;
-	n = rb.search(3);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n= rb.search(2);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n= rb.search(1);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n= rb.search(4);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n= rb.search(6);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n = rb.search(9);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-		
-	n = rb.search(5);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-		
-	n = rb.search(8);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
-	n = rb.search(7);
-	cout << rb.deleteNode(n)<<endl;
-	rb.print();
-	
+	testRedBlackTree();
 	return 1;
+}
+
+void testRedBlackTree()
+{
+	RedBlackTree rb;
+	const int cArraySize = 9;
+	int insertArray[cArraySize] = { 5,3,7,4,6,1,9,2,8 };
+	rb.print();
+	for(int i=0; i<cArraySize; i++)
+	{
+		cout<<"Insert "<<insertArray[i]<<endl;
+		rb.insert(insertArray[i]);
+		rb.print();
+	}
+	
+	int deleteArray[cArraySize] = { 3, 2, 1, 4, 5, 6, 9, 8, 7};
+	for(int i=0; i<cArraySize; i++)
+	{
+		RedBlackTreeNode * rbNode = rb.search(deleteArray[i]);
+		if(rbNode!=0)
+		{
+			cout<<"Delete " << rb.deleteNode(rbNode)<<endl;
+			rb.print();
+		}
+		else
+		{
+			cout<<"Unable to find rb node value = " << deleteArray[i]<<endl;
+		}
+	}
 }
