@@ -1,7 +1,7 @@
 # Algorithms
 ## HOW TO BUILD:
 -cd directory  
--make
+-make  
 -./Solution  
 
 ## Implementations:
