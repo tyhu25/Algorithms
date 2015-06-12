@@ -28,11 +28,35 @@ int main()
 	cout << rb.deleteNode(n)<<endl;
 	rb.print();
 	
+	n= rb.search(2);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
+	n= rb.search(1);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
+	n= rb.search(4);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
 	n= rb.search(6);
 	cout << rb.deleteNode(n)<<endl;
 	rb.print();
 	
 	n = rb.search(9);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+		
+	n = rb.search(5);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+		
+	n = rb.search(8);
+	cout << rb.deleteNode(n)<<endl;
+	rb.print();
+	
+	n = rb.search(7);
 	cout << rb.deleteNode(n)<<endl;
 	rb.print();
 	

@@ -109,18 +109,15 @@ int RedBlackTree::deleteNode(RedBlackTreeNode *z)
 	if(z->left==nil||z->right==nil) y = z;
 	else y = getSuccessor(z);
 	x = ((y->left==nil)?(y->right):(y->left));
-	if(x!=nil) x->parent = y->parent;
+	//if(x!=nil) x->parent = y->parent;
+	x->parent = y->parent;
 	if(y->parent==0) root = x;
 	else if(y==y->parent->left) y->parent->left = x;
 	else y->parent->right = x;
-	
-	if(y!=z)
-	{
-		z->val = y->val;
-		z->color = y->color;
-	}
-	
+
+	if(y!=z) z->val = y->val;
 	if(y->color==COLOR_BLACK) deleteFixUp(x);
+	
 	
 #ifdef CHECK_RB_TREE_ASSUMPTIONS
 	checkAssumptions();
