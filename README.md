@@ -5,4 +5,6 @@
 -./Solution  
 
 ## Implementations:
--Redblack Tree
+-Redblack Tree  
+-Dynamic Programming(Multiply Matrix Chain)  
+
