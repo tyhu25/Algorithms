@@ -54,10 +54,24 @@ void BTree::insert(int val)
 {
 	if(root==0)
 	{
+		root = new BTreeNode(t);
+		root->key[0] = val;
+		root->n = 1;
 	}
 	else
 	{
-		
+		if(root->n==2*t-1)
+		{
+			BTreeNode * s = new BTreeNode(t, false);
+			s->c[0]=root;
+			splitChild(s, 0, root);
+			root = s;
+			insertNotFull(s, val);
+		}
+		else
+		{
+			insertNotFull(root, val);
+		}	
 	}
 }
 
