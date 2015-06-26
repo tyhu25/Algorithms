@@ -19,6 +19,10 @@ class BTree
 {
 public:
 	BTree(int t);
+	void traverse();
+	void insert(int val);
+	void insertNotFull(BTreeNode * r, int val);
+	void splitChild(BTreeNode * x, int i, BTreeNode *y);
 private:
 	BTreeNode * root;
 	int t;
