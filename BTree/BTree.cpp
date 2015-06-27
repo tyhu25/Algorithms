@@ -2,6 +2,8 @@
 #include <iostream>
 #include <queue>
 
+#define DEBUG
+
 BTreeNode::BTreeNode(int t, bool leaf)
 {
 	this->t = t;
@@ -52,6 +54,9 @@ void BTree::traverse()
 
 void BTree::insert(int val)
 {
+#ifdef DEBUG
+	cout<<"Insert: "<<val<<endl;
+#endif
 	if(root==0)
 	{
 		root = new BTreeNode(t);
@@ -75,12 +80,75 @@ void BTree::insert(int val)
 	}
 }
 
-void BTree::insertNotFull(BTreeNode * r, int val)
+void BTree::insertNotFull(BTreeNode * x, int val)
 {
-	
+#ifdef DEBUG
+	cout<<"InsertNotFull"<<endl;
+#endif
+	int i = x->n-1;
+	if(x->leaf)
+	{	
+		while(i>=0 && x->key[i]>val)
+		{
+			x->key[i+1] = x->key[i];
+			i--;
+		}
+		x->key[i+1] = val;
+		x->n = x->n+1;
+		//DISK_WRITE(x)
+	}
+	else
+	{	
+		while(i>=0 && x->key[i]>val)
+		{
+			x->key[i+1] = x->key[i];
+			i--;
+		}
+		i++;
+		//DISK_READ(x->c[i])
+		if(x->c[i]->n==2*t-1)
+		{
+			splitChild(x, i, x->c[i]);
+			if(val>x->key[i])
+			{
+				i++;
+			}
+		}
+		
+		insertNotFull(x->c[i], val);
+	}
 }
 
 void BTree::splitChild(BTreeNode * x, int i, BTreeNode *y)
 {
+#ifdef DEBUG
+	cout<<"Split"<<endl;
+#endif
+	BTreeNode * z = new BTreeNode(t, y->leaf);
+	z->n = t-1;
+	for(int j=0; j<t-1; j++)
+	{
+		z->key[j]=y->key[t+j];
+	}
+	if(!y->leaf)
+	{
+		for(int j=0; j<t; j++)
+		{
+			z->c[j] = y->c[j+t];
+		}
+	}
+	y->n = t-1;
 	
+	for(int j=x->n; j>=i+1; j--)
+	{
+		x->c[j+1] = x->c[j];
+	}
+		
+	x->c[i+1] = z;
+	for(int j=x->n-1; j>=i; j--)
+	{
+		x->key[j+1]=x->key[j];
+	}
+	x->key[i] = y->key[t-1];
+	x->n = x->n+1;
 }
