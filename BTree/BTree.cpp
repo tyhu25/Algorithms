@@ -21,6 +21,9 @@ BTree::BTree(int t)
 
 void BTree::traverse()
 {
+#ifdef DEBUG
+	cout<<"B-Tree traverse: \n";
+#endif
 	if(root==0) return;
 	queue<BTreeNode *> Q;
 	Q.push(root);
@@ -50,6 +53,39 @@ void BTree::traverse()
 		numOfNodesPrev = numOfNodesCurr;
 		cout<<"\n";
 	}
+}
+
+void BTree::printBTreeNode(BTreeNode *node)
+{
+	if(node==0)
+	{
+		cout<<"Node is NULL\n";
+	}
+	else
+	{
+		for(int i=0; i<node->n; i++)
+		{
+			cout<<node->key[i]<<" ";
+		}
+	}
+}
+
+BTreeNode * BTree::search(int val)
+{
+#ifdef DEBUG
+	cout<<"Search for " <<val<<endl;
+#endif
+	if(root==0) return 0;
+	return search(root, val);
+}
+
+BTreeNode * BTree::search(BTreeNode * node, int val)
+{
+	int i = 0;
+	while(i<node->n && node->key[i]<val) i++;
+	if(node->key[i]==val) return node;
+	if(node->leaf) return 0;
+	return search(node->c[i], val);
 }
 
 void BTree::insert(int val)
@@ -83,7 +119,9 @@ void BTree::insert(int val)
 void BTree::insertNotFull(BTreeNode * x, int val)
 {
 #ifdef DEBUG
-	cout<<"InsertNotFull"<<endl;
+	cout<<"InsertNotFull: ";
+	printBTreeNode(x);
+	cout<<endl;
 #endif
 	int i = x->n-1;
 	if(x->leaf)
@@ -122,7 +160,11 @@ void BTree::insertNotFull(BTreeNode * x, int val)
 void BTree::splitChild(BTreeNode * x, int i, BTreeNode *y)
 {
 #ifdef DEBUG
-	cout<<"Split"<<endl;
+	cout<<"Split: panret( ";
+	printBTreeNode(x);
+	cout<<"); child( ";
+	printBTreeNode(y);
+	cout<<" )\n";
 #endif
 	BTreeNode * z = new BTreeNode(t, y->leaf);
 	z->n = t-1;
