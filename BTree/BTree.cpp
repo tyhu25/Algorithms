@@ -194,3 +194,199 @@ void BTree::splitChild(BTreeNode * x, int i, BTreeNode *y)
 	x->key[i] = y->key[t-1];
 	x->n = x->n+1;
 }
+
+int BTree::findKey(BTreeNode * node, int val)
+{
+	int index = 0;
+	while(index<node->n && node->key[index]<val) index++;
+		
+	return index;
+}
+
+void BTree::remove(int val)
+{
+	if(root == 0) cout<<"B-Tree is empty"<<endl;
+	
+	remove(root, val);
+}
+
+void BTree::remove(BTreeNode * node, int val)
+{
+	int index = findKey(node, val);
+	
+	if(index<node->n && val == node->key[index])
+	{
+		if(node->leaf)
+		{
+			removeFromLeaf(node, index);
+		}
+		else
+		{
+			removeFromNonLeaf(node, index);
+		}
+	}
+	else
+	{
+		if(node->leaf)
+		{
+			cout<< "The key does not exist in the tree" <<endl;
+			return;
+		}
+		
+		if(node->c[index]->n < t)
+		{
+			fill(node, index);
+		}
+		
+		remove(node->c[node->n], val);
+	}
+}
+
+void BTree::removeFromLeaf(BTreeNode * node, int index)
+{
+	for(int i=index; i<node->n-1; i++)
+	{
+		node->key[i]=node->key[i+1];
+	}
+	node->n=node->n-1;
+}
+
+void BTree::removeFromNonLeaf(BTreeNode * node, int index)
+{
+	int k = node->key[index];
+	if(node->c[index]->n>=t)
+	{
+		int pred = getPred(node, index);
+		node->key[index] = pred;
+		remove(node->c[index], pred);
+	}
+	else if(node->c[index+1]->n>=t)
+	{
+		int succ = getSucc(node, index);
+		node->key[index] = succ;
+		remove(node->c[index+1], succ);
+	}
+	else
+	{
+		merge(node, index);
+		remove(node->c[index], k);
+	}
+}
+
+int BTree::getPred(BTreeNode * node, int index)
+{
+	BTreeNode * curr = node->c[index];
+	while(!curr->leaf) curr = curr->c[curr->n];
+	
+	return curr->key[curr->n-1];
+}
+
+int BTree::getSucc(BTreeNode * node, int index)
+{
+	BTreeNode * curr = node->c[index+1];
+	while(!curr->leaf) curr = curr->c[0];
+	
+	return curr->key[0];
+}
+
+void BTree::fill(BTreeNode *node, int index)
+{
+	if(index!=0 && node->c[index-1]->n>=t) borrowFromPrev(node, index);
+	else if(index!=node->n && node->c[index+1]->n>=t) borrowFromNext(node, index);
+	else
+	{
+		if(index!=node->n) merge(node, index);
+		else merge(node, index-1);
+	}
+}
+
+void BTree::borrowFromPrev(BTreeNode * node, int index)
+{
+	BTreeNode * child = node->c[index];
+	BTreeNode * sibling = node->c[index-1];
+	for(int i=child->n-1; i>=0; i--)
+	{
+		child->key[i+1] = child->key[i];
+	}
+	if(!child->leaf)
+	{
+		for(int i=child->n; i>=0; --i)
+		{
+			child->c[i+1] = child->c[i];
+		}
+	}
+	child->key[0]=node->key[index-1];
+	
+	if(!node->leaf)
+	{
+		child->c[0] = sibling->c[sibling->n];
+	}
+	node->key[index-1] = sibling->key[sibling->n-1];
+	child->n=child->n+1;
+	sibling->n=sibling->n-1;
+}
+
+void BTree::borrowFromNext(BTreeNode * node, int index)
+{
+	BTreeNode * child = node->c[index];
+	BTreeNode * sibling = node->c[index+1];
+	
+	child->key[child->n] = node->key[index];
+	if(!child->leaf)
+	{
+		child->c[child->n+1] = sibling->c[0];
+	}
+	node->key[index] = sibling->key[0];
+	
+	for(int i=1; i<sibling->n; i++) sibling->key[i-1] = sibling->key[i];
+	
+	if(!sibling->leaf)
+	{
+		for(int i=1; i<=sibling->n; i++)
+		{
+			sibling->c[i-1] = sibling->c[i];
+		}
+	}
+	child->n = child->n+1;
+	sibling->n = sibling->n-1;
+}
+
+void BTree::merge(BTreeNode * node, int index)
+{
+	BTreeNode * child = node->c[index];
+	BTreeNode * sibling = node->c[index+1];
+	child->key[t-1] = node->key[index];
+	
+	for(int i=0; i<sibling->n; i++)
+	{
+		child->key[i+t] = sibling->key[i];	
+	}
+	
+	if(!child->leaf)
+	{
+		for(int i=0; i<=sibling->n; ++i)
+		{
+			child->c[i+t] = sibling->c[i];
+		}
+	}
+	
+	for(int i=index+1; i<node->n; i++)
+	{
+		node->key[i-1] = node->key[i];
+	}
+	
+	for(int i=index+1; i<node->n; i++)
+	{
+		node->key[i-1] = node->key[i];
+	}
+	
+	for(int i=index+2; i<=node->n; i++)
+	{
+		node->c[i-1] = node->c[i];
+	}
+	
+	child->n = child->n+sibling->n+1;
+	node->n = node->n-1;
+	
+	delete sibling;
+}
