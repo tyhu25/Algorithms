@@ -137,11 +137,7 @@ void BTree::insertNotFull(BTreeNode * x, int val)
 	}
 	else
 	{	
-		while(i>=0 && x->key[i]>val)
-		{
-			x->key[i+1] = x->key[i];
-			i--;
-		}
+		while(i>=0 && x->key[i]>val) i--;
 		i++;
 		//DISK_READ(x->c[i])
 		if(x->c[i]->n==2*t-1)
@@ -205,6 +201,9 @@ int BTree::findKey(BTreeNode * node, int val)
 
 void BTree::remove(int val)
 {
+#ifdef DEBUG
+	cout<<"Remove: "<<val<<endl;
+#endif
 	if(root == 0) cout<<"B-Tree is empty"<<endl;
 	
 	remove(root, val);
@@ -233,17 +232,25 @@ void BTree::remove(BTreeNode * node, int val)
 			return;
 		}
 		
+		bool flag = (index==node->n? true: false);
+		
 		if(node->c[index]->n < t)
 		{
 			fill(node, index);
 		}
 		
-		remove(node->c[node->n], val);
+		if(flag && index>node->n) remove(node->c[index-1], val);
+		else remove(node->c[index], val);
 	}
 }
 
 void BTree::removeFromLeaf(BTreeNode * node, int index)
 {
+#ifdef DEBUG
+	cout<<"removeFromLeaf: ";
+	printBTreeNode(node);
+	cout<<endl;
+#endif
 	for(int i=index; i<node->n-1; i++)
 	{
 		node->key[i]=node->key[i+1];
@@ -253,6 +260,11 @@ void BTree::removeFromLeaf(BTreeNode * node, int index)
 
 void BTree::removeFromNonLeaf(BTreeNode * node, int index)
 {
+#ifdef DEBUG
+	cout<<"removeFromNonLeaf: ";
+	printBTreeNode(node);
+	cout<<endl;
+#endif
 	int k = node->key[index];
 	if(node->c[index]->n>=t)
 	{
@@ -368,11 +380,6 @@ void BTree::merge(BTreeNode * node, int index)
 		{
 			child->c[i+t] = sibling->c[i];
 		}
-	}
-	
-	for(int i=index+1; i<node->n; i++)
-	{
-		node->key[i-1] = node->key[i];
 	}
 	
 	for(int i=index+1; i<node->n; i++)

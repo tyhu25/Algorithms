@@ -36,6 +36,8 @@ void testBTree()
 	bt.insert(21);
 	bt.insert(22);
 	bt.traverse();
+	bt.insert(14);
+	bt.traverse();
 	
 	BTreeNode * node = 0;
 	node = bt.search(5);
@@ -47,5 +49,11 @@ void testBTree()
 	node = bt.search(23);
 	bt.printBTreeNode(node);
 	cout<<endl;
+	
+	bt.remove(9);
+	bt.traverse();
+	
+	bt.remove(12);
+	bt.traverse();
 	
 }
