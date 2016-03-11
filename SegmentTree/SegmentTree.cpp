@@ -66,30 +66,31 @@ private:
     SegmentTreeNode *root; 
 };
 
-int testST(SegmentTree &st, int s, int e) {
-    printf("[%d]-[%d] = %d\n", s, e, st.sum(s, e));
+int testST(vector<int> &nums, SegmentTree &st) {
+    int size = nums.size();
+    for(int i=-2; i<size+1; i++) {
+        for(int j=i+1; j<size+2; j++) {
+            int rangeSum = st.sum(i, j);
+            int expectedSum = 0;
+            for(int k=max(0,i); k<=min(size-1,j); k++) {
+                expectedSum+=nums[k];
+            }
+            if(rangeSum!=expectedSum) {
+                printf("Test on range [%d]-[%d] failed. Get: %d, Expected: %d\n", i, j, rangeSum, expectedSum);
+            }
+        }
+    }
+    printf("Test done\n");
 }
+
 int main() {
     vector<int> nums = {1,2,3,4,5,6,7,8,9};
     SegmentTree st(nums);
-    testST(st, 0, 10);
-    testST(st, -2, -1);
-    testST(st, 10, 15);
-    testST(st, -1, 2);
-    testST(st, 1, 2);
-    testST(st, 2, 9);
-    testST(st, 3, 7);
-    testST(st, 5, 8);
+    testST(nums, st);
     st.update(2, 20);
     st.update(5, 30);
-    testST(st, 0, 10);
-    testST(st, -2, -1);
-    testST(st, 10, 15);
-    testST(st, -1, 2);
-    testST(st, 1, 2);
-    testST(st, 2, 9);
-    testST(st, 3, 7);
-    testST(st, 5, 8);
-
+    nums[2] = 20;
+    nums[5] = 30;
+    testST(nums, st);
     return 0;
 }
