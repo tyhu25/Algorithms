@@ -51,15 +51,53 @@ public:
         return res;
     }
     
+    int find(int freq) {
+        int size = mTree.size()-1;
+        int bitMask = highBit(size);
+        int idx = 0;
+        while((bitMask!=0) && idx<=size) {
+            int tIdx = idx+bitMask;
+            //printf("tIdx=%d, mTree[tIdx]=%d\n", tIdx, mTree[tIdx]);
+            if(tIdx>size) {
+                
+            }else if(mTree[tIdx] == freq) {
+                return tIdx;
+            }  else if(mTree[tIdx] < freq) {
+                freq-=mTree[tIdx];
+                idx = tIdx;
+            }
+            bitMask>>=1;
+        }
+        if(freq!=0) {
+            return -1;
+        } else {
+            return idx;
+        }
+    }
+    
 private:
     int lowBit(int num) {
         return num & (-num);
     }
+    
+    int highBit(int num) {
+        if(!num) {
+            return 0;
+        }
+        int res = 1;
+        num >>=1;
+        while(num) {
+            res<<=1;
+            num>>=1;
+        }
+        return res;
+    }
+    
     vector<int> mTree;
     vector<int> mNums;
 };
 
-void testBITSum(vector<int> &nums, BinaryIndexedTree &BIT) {
+void testBITSum(vector<int> nums, BinaryIndexedTree &BIT) {
     printf("testBITSum\n");
     int failureCnt = 0;
     for(int i=0; i<nums.size(); i++){
@@ -76,7 +114,7 @@ void testBITSum(vector<int> &nums, BinaryIndexedTree &BIT) {
     printf("Test Done, %d failed\n", failureCnt);
 }
 
-void testBitRead(vector<int> &nums, BinaryIndexedTree &BIT) {
+void testBitRead(vector<int> nums, BinaryIndexedTree &BIT) {
     printf("testBitRead\n");
     int failureCnt = 0;
     for(int i=0; i<nums.size(); i++) {
@@ -89,7 +127,22 @@ void testBitRead(vector<int> &nums, BinaryIndexedTree &BIT) {
     printf("Test Done, %d failed\n", failureCnt);
 }
 
-void testBIT(vector<int> &nums) {
+void testBITFind(vector<int> nums) {
+    BinaryIndexedTree BIT(nums);
+    int freq = 0;
+    int failureCnt = 0;
+    for(int i=0; i<nums.size(); i++) {
+        freq +=nums[i];
+        int idx = BIT.find(freq);
+        if(idx!=i+1) {
+            printf("Error in BIT.find(), find %d at index %d, expected %d\n", freq, idx, i);
+            failureCnt++;
+        }
+    }
+    printf("Test Done, %d failed\n", failureCnt);
+}
+
+void testBIT(vector<int> nums) {
     BinaryIndexedTree BIT(nums);
     testBITSum(nums, BIT);
     testBitRead(nums, BIT);
@@ -105,5 +158,6 @@ void testBIT(vector<int> &nums) {
 int main() {
     vector<int> nums={1,2,3,4,5,6,7,8,9,10};
     testBIT(nums);
+    testBITFind(nums);
     return 0;
 }
