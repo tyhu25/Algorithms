@@ -127,6 +127,7 @@ void printArray(vector<int> &vec) {
     cout<<endl;
 }
 
+//Sparse Table(ST) algorithm
 class RMQ {
 public:
     RMQ(const vector<int> &Array) {
