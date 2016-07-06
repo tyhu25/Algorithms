@@ -5,6 +5,7 @@
 
 using namespace std;
 
+#ifdef SEGMENT_TREE_NODE_IMPL
 struct SegmentTreeNode {
     int l, r, sum;
     SegmentTreeNode *left;
@@ -67,6 +68,66 @@ private:
 
     SegmentTreeNode *root; 
 };
+#endif
+
+class SegmentTree {
+public:
+    SegmentTree(const vector<int> &nums) {
+        mNums = nums;
+        int n = nums.size();
+        int size = 2*(int)pow(2,(ceil(log2(n))))-1;
+        mST = vector<int>(size, 0);
+        buildST(0, n-1, 0);
+    }
+    /*
+    ~SegmentTree() {
+        
+    }
+    */
+    int sum(int start, int end) {
+        return sum(start, end, 0, mNums.size()-1, 0);
+    }
+
+    void update(int i, int val) {
+        int diff = val - mNums[i];
+        mNums[i] = val;
+        update(i, diff, 0, mNums.size()-1, 0);
+    }
+
+private:
+    int buildST(int start, int end, int index) {
+        if(start==end) {
+            mST[index] = mNums[start];
+            return mST[index];
+        }
+        int mid = start + (end-start)/2;
+        mST[index] = buildST(start, mid, 2*index+1) + buildST(mid+1, end, 2*index+2);
+        return mST[index];
+    }
+
+    int sum(int qs, int qe, int ss, int se, int index) {
+        if(qs>se || qe<ss) {
+            return 0;
+        }
+        if(qs<=ss && qe>=se) {
+            return mST[index];
+        }
+        int mid = ss + (se-ss)/2;
+        return sum(qs, qe, ss, mid, 2*index+1) + sum(qs, qe, mid+1, se, 2*index+2);
+    }
+
+    void update(int idx, int diff, int start, int end, int stIdx) {
+        if(idx<start || idx>end) return;
+        mST[stIdx]+=diff;
+        if(start!=end) {
+            int mid = start + (end-start)/2;
+            update(idx, diff, start, mid, stIdx*2+1);
+            update(idx, diff, mid+1, end, stIdx*2+2);
+        }
+    }
+    vector<int> mNums;
+    vector<int> mST;
+};
 
 int testST(vector<int> &nums, SegmentTree &st) {
     int size = nums.size();
@@ -90,11 +151,12 @@ int main() {
 
     SegmentTree st(nums);
     testST(nums, st);
+
     st.update(2, 20);
     st.update(5, 30);
     nums[2] = 20;
     nums[5] = 30;
     testST(nums, st);
-
+    
     return 0;
 }
