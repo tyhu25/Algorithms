@@ -79,11 +79,7 @@ public:
         mST = vector<int>(size, 0);
         buildST(0, n-1, 0);
     }
-    /*
-    ~SegmentTree() {
-        
-    }
-    */
+
     int sum(int start, int end) {
         return sum(start, end, 0, mNums.size()-1, 0);
     }
@@ -92,6 +88,13 @@ public:
         int diff = val - mNums[i];
         mNums[i] = val;
         update(i, diff, 0, mNums.size()-1, 0);
+    }
+
+    void updateRange(int l, int r, int val) {
+        for(int i=l; i<=r; i++) {
+            mNums[i] += val;
+        }
+        upadteRange(0, mNums.size()-1, l, r, 0, val);
     }
 
 private:
@@ -125,6 +128,19 @@ private:
             update(idx, diff, mid+1, end, stIdx*2+2);
         }
     }
+
+    void upadteRange(int start, int end, int l, int r, int stIdx, int val) {
+        if(start>end || l>end || r<start) return;
+        if(start==end) {
+            mST[stIdx] += val;
+            return;
+        }
+        int mid=(start+end)/2;
+        upadteRange(start, mid, l, r, stIdx*2+1, val);
+        upadteRange(mid+1, end, l, r, stIdx*2+2, val);
+        mST[stIdx] = mST[stIdx*2+1] + mST[stIdx*2+2];
+    }
+
     vector<int> mNums;
     vector<int> mST;
 };
@@ -157,6 +173,15 @@ int main() {
     nums[2] = 20;
     nums[5] = 30;
     testST(nums, st);
-    
+
+    int l = 2;
+    int r = 6;
+    int val = 5;
+    st.updateRange(l,r,val);
+    //Update orginal array for testing purpose
+    for(int i=l; i<=r; i++) {
+        nums[i]+=val;
+    }
+    testST(nums, st);
     return 0;
 }
