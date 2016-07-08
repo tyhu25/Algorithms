@@ -5,6 +5,8 @@
 
 using namespace std;
 
+#define SEGMENT_TREE_ARRAY_IMPL
+
 #ifdef SEGMENT_TREE_NODE_IMPL
 struct SegmentTreeNode {
     int l, r, sum;
@@ -70,6 +72,7 @@ private:
 };
 #endif
 
+#ifdef SEGMENT_TREE_ARRAY_IMPL
 class SegmentTree {
 public:
     SegmentTree(const vector<int> &nums) {
@@ -77,11 +80,16 @@ public:
         int n = nums.size();
         int size = 2*(int)pow(2,(ceil(log2(n))))-1;
         mST = vector<int>(size, 0);
+        mLazy = vector<int>(size, 0);
         buildST(0, n-1, 0);
     }
 
     int sum(int start, int end) {
         return sum(start, end, 0, mNums.size()-1, 0);
+    }
+
+    int queryLazy(int l, int r) {
+        return queryLazy(l, r, 0, mNums.size()-1, 0);
     }
 
     void update(int i, int val) {
@@ -95,6 +103,13 @@ public:
             mNums[i] += val;
         }
         upadteRange(0, mNums.size()-1, l, r, 0, val);
+    }
+
+    void updateRangeLazy(int l, int r, int val) {
+        for(int i=l; i<=r; i++) {
+            mNums[i] += val;
+        }
+        upadteRangeLazy(0, mNums.size()-1, l, r, 0, val);
     }
 
 private:
@@ -119,6 +134,27 @@ private:
         return sum(qs, qe, ss, mid, 2*index+1) + sum(qs, qe, mid+1, se, 2*index+2);
     }
 
+    int queryLazy(int l, int r, int start, int end, int index) {
+        if(start>end || l>end || r<start) {
+            return 0;
+        }
+
+        if(mLazy[index]!=0) {
+            mST[index] += (end-start+1)*mLazy[index];
+            if(start!=end) {
+                mLazy[index*2+1]+=mLazy[index];
+                mLazy[index*2+2]+=mLazy[index];
+            }
+            mLazy[index]=0;
+        }
+
+        if(l<=start && r>=end) {
+            return mST[index];
+        }
+        int mid = (start+end)/2;
+        return queryLazy(l, r, start, mid, 2*index+1) + queryLazy(l, r, mid+1, end, 2*index+2);
+    }
+
     void update(int idx, int diff, int start, int end, int stIdx) {
         if(idx<start || idx>end) return;
         mST[stIdx]+=diff;
@@ -141,15 +177,44 @@ private:
         mST[stIdx] = mST[stIdx*2+1] + mST[stIdx*2+2];
     }
 
+    void upadteRangeLazy(int start, int end, int l, int r, int stIdx, int val) {
+        if(start>end || l>end || r<start) return;
+        if(mLazy[stIdx]!=0) {
+            mST[stIdx] += (end-start+1)*mLazy[stIdx];
+            if(start!=end) {
+                mLazy[stIdx*2+1]+=mLazy[stIdx];
+                mLazy[stIdx*2+2]+=mLazy[stIdx];
+            }
+            mLazy[stIdx]=0;
+        }
+
+        if(l<=start && r>=end) {
+            mST[stIdx] += (end-start+1)*val;
+            if(start!=end) {
+                mLazy[stIdx*2+1]+=val;
+                mLazy[stIdx*2+2]+=val;
+            }
+            return;
+        }
+        int mid = (start+end)/2;
+        upadteRangeLazy(start, mid, l, r, stIdx*2+1, val);
+        upadteRangeLazy(mid+1, end, l, r, stIdx*2+2, val);
+        mST[stIdx] = mST[stIdx*2+1] + mST[stIdx*2+2];
+    }
+
     vector<int> mNums;
     vector<int> mST;
+    vector<int> mLazy;
 };
+#endif
 
-int testST(vector<int> &nums, SegmentTree &st) {
+typedef int (SegmentTree::*pQueryFunc)(int,int);
+
+int testST(vector<int> &nums, SegmentTree &st, pQueryFunc pfun) {
     int size = nums.size();
     for(int i=-2; i<size+1; i++) {
         for(int j=i+1; j<size+2; j++) {
-            int rangeSum = st.sum(i, j);
+            int rangeSum = (st.*pfun)(i, j);
             int expectedSum = 0;
             for(int k=max(0,i); k<=min(size-1,j); k++) {
                 expectedSum+=nums[k];
@@ -166,14 +231,15 @@ int main() {
     vector<int> nums = {1,2,3,4,5,6,7,8,9};
 
     SegmentTree st(nums);
-    testST(nums, st);
+    testST(nums, st, &SegmentTree::queryLazy);
 
     st.update(2, 20);
     st.update(5, 30);
     nums[2] = 20;
     nums[5] = 30;
-    testST(nums, st);
+    testST(nums, st, &SegmentTree::sum);
 
+#ifdef SEGMENT_TREE_ARRAY_IMPL
     int l = 2;
     int r = 6;
     int val = 5;
@@ -182,6 +248,17 @@ int main() {
     for(int i=l; i<=r; i++) {
         nums[i]+=val;
     }
-    testST(nums, st);
+    testST(nums, st, &SegmentTree::queryLazy);
+
+    l = 3;
+    r = 6;
+    val=-2;
+    st.updateRangeLazy(l,r,val);
+    for(int i=l; i<=r; i++) {
+        nums[i]+=val;
+    }
+    testST(nums, st, &SegmentTree::queryLazy);
+#endif
+
     return 0;
 }
